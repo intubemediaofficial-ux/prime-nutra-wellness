@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PrimeNutra Wellness — Admin</title>
+  <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+  <!-- Login -->
+  <div id="login" class="login-wrap">
+    <form class="login-card" id="loginForm">
+      <div class="brand-leaf">🌿</div>
+      <h1>PrimeNutra Admin</h1>
+      <p>Sign in to manage your store</p>
+      <div class="field"><label>Username</label><input id="lgUser" autocomplete="username" required></div>
+      <div class="field"><label>Password</label><input id="lgPass" type="password" autocomplete="current-password" required></div>
+      <button class="btn" style="width:100%" type="submit">Sign in</button>
+      <p id="lgErr" class="help" style="color:var(--red);margin-top:12px"></p>
+    </form>
+  </div>
+
+  <!-- App -->
+  <div id="app" class="app hidden">
+    <aside class="sidebar">
+      <div class="logo">🌿 PrimeNutra</div>
+      <nav class="nav" id="nav">
+        <a data-view="dashboard" class="active">📊 Dashboard</a>
+        <a data-view="products">📦 Products</a>
+        <a data-view="orders">🧾 Orders</a>
+        <div class="sep">Catalog</div>
+        <a data-view="categories">🗂️ Categories</a>
+        <a data-view="concerns">💚 Health Concerns</a>
+        <a data-view="import">📤 Import / Export</a>
+        <div class="sep">Store</div>
+        <a data-view="coupons">🏷️ Coupons</a>
+        <a data-view="settings">⚙️ Settings</a>
+        <a data-view="account">🔑 Password</a>
+        <a id="logout">🚪 Logout</a>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <h2 id="viewTitle">Dashboard</h2>
+        <div class="who">Signed in as <b id="whoName">admin</b></div>
+      </div>
+      <div id="view"></div>
+    </main>
+  </div>
+
+  <div id="modalRoot"></div>
+  <div id="toast"></div>
+  <script src="/admin/admin.js"></script>
+</body>
+</html>

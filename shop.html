@@ -61,6 +61,7 @@
   <script src="js/products.js"></script>
   <script src="js/app.js"></script>
   <script>
+    window.pageRender = function () {
     var params = new URLSearchParams(location.search);
     var state = {
       cats: new Set(params.get("category") ? [params.get("category")] : []),
@@ -119,6 +120,9 @@
     });
 
     apply();
+    };
+    window.pageRender();
   </script>
+  <script src="js/api.js"></script>
 </body>
 </html>

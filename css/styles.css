@@ -128,6 +128,8 @@ h1, h2, h3 { line-height: 1.2; font-weight: 600; }
 .card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
 .card__media { aspect-ratio: 1/1; display: grid; place-items: center; position: relative; }
 .card__media .em { font-size: 4rem; filter: drop-shadow(0 8px 14px rgba(20,54,31,.18)); }
+.card__img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.pd__media .pd__img { width: 100%; height: 100%; object-fit: cover; border-radius: 22px; }
 .card__badge { position: absolute; top: 12px; left: 12px; background: var(--amber); color: #2a1d05;
   font-size: .68rem; font-weight: 700; padding: 4px 9px; border-radius: 999px; }
 .card__disc { position: absolute; top: 12px; right: 12px; background: var(--green-700); color: #fff;

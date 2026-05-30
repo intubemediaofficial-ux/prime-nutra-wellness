@@ -36,7 +36,22 @@
       return 0;
     }
 
-    function render() {
+    function successScreen(name, orderId, total, method, phone) {
+      wrap.innerHTML =
+        '<div style="text-align:center;max-width:560px;margin:0 auto;padding:30px">' +
+          '<div style="font-size:4rem">✅</div>' +
+          '<h2 style="color:var(--green-900);margin:10px 0">Order Placed Successfully!</h2>' +
+          '<p style="color:var(--muted)">Thank you, ' + (name || "") + '! Your order <b>#' + orderId + '</b> for <b>' + money(total) + '</b> (' + method + ') has been received.</p>' +
+          '<p style="color:var(--muted);margin-top:8px">We will call you on ' + phone + ' to confirm delivery. 🌿</p>' +
+          '<div style="margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
+            '<a class="btn btn--primary" href="shop.html">Continue Shopping</a>' +
+            '<a class="btn btn--ghost" href="index.html">Back to Home</a></div>' +
+        '</div>';
+      PNW.setCart([]);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    window.pageRender = function () {
       var cart = PNW.getCart();
       if (!cart.length) {
         wrap.innerHTML = '<div class="empty">Your cart is empty 🛒<br><br><a class="btn btn--primary" href="shop.html">Start Shopping</a></div>';
@@ -46,6 +61,12 @@
       var disc = discountTier(sub);
       var shipping = 0; // free delivery
       var total = sub - disc + shipping;
+
+      var cfg = (window.PNW_API && window.PNW_API.config) || { cod_enabled: true, razorpay_enabled: false };
+      var payOpts = "";
+      if (cfg.cod_enabled !== false) payOpts += '<label class="active"><input type="radio" name="pay" value="COD" checked /> 💵 Cash on Delivery (COD)</label>';
+      if (cfg.razorpay_enabled) payOpts += '<label' + (cfg.cod_enabled === false ? ' class="active"' : '') + '><input type="radio" name="pay" value="Razorpay"' + (cfg.cod_enabled === false ? ' checked' : '') + ' /> 📱 Pay Online (UPI / Card / NetBanking)</label>';
+      if (!payOpts) payOpts = '<label class="active"><input type="radio" name="pay" value="COD" checked /> 💵 Cash on Delivery (COD)</label>';
 
       wrap.innerHTML =
         '<div class="checkout">' +
@@ -60,10 +81,7 @@
             '<div class="field--row"><div class="field"><label>Pincode *</label><input required name="pincode" pattern="[0-9]{6}" /></div>' +
             '<div class="field"><label>Landmark</label><input name="landmark" /></div></div>' +
             '<h3 style="color:var(--green-900);margin:18px 0 12px">Payment Method</h3>' +
-            '<div class="pay-opts">' +
-              '<label class="active"><input type="radio" name="pay" value="COD" checked /> 💵 Cash on Delivery (COD)</label>' +
-              '<label><input type="radio" name="pay" value="UPI" /> 📱 UPI / Online Payment</label>' +
-            '</div>' +
+            '<div class="pay-opts">' + payOpts + '</div>' +
           '</form>' +
           '<aside class="summary">' +
             '<h3 style="color:var(--green-900);margin-bottom:12px">Order Summary</h3>' +
@@ -100,22 +118,51 @@
       document.getElementById("orderForm").addEventListener("submit", function (e) {
         e.preventDefault();
         var fd = new FormData(e.target);
-        var orderId = "PNW" + Date.now().toString().slice(-8);
-        wrap.innerHTML =
-          '<div style="text-align:center;max-width:560px;margin:0 auto;padding:30px">' +
-            '<div style="font-size:4rem">✅</div>' +
-            '<h2 style="color:var(--green-900);margin:10px 0">Order Placed Successfully!</h2>' +
-            '<p style="color:var(--muted)">Thank you, ' + (fd.get("name") || "") + '! Your order <b>#' + orderId + '</b> for <b>' + money(total) + '</b> (' + fd.get("pay") + ') has been received.</p>' +
-            '<p style="color:var(--muted);margin-top:8px">We will call you on ' + fd.get("phone") + ' to confirm delivery. 🌿</p>' +
-            '<div style="margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
-              '<a class="btn btn--primary" href="shop.html">Continue Shopping</a>' +
-              '<a class="btn btn--ghost" href="index.html">Back to Home</a></div>' +
-          '</div>';
-        PNW.setCart([]);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        var method = fd.get("pay") === "Razorpay" ? "Razorpay" : "COD";
+        var submitBtn = e.target.querySelector('[type="submit"]') || document.querySelector('[form="orderForm"]');
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Placing order…"; }
+        var localFallback = function () {
+          var orderId = "PNW" + Date.now().toString().slice(-8);
+          successScreen(fd.get("name"), orderId, total, method, fd.get("phone"));
+        };
+        if (!window.PNW_API) { localFallback(); return; }
+        var payload = {
+          customer_name: fd.get("name"), phone: fd.get("phone"), email: fd.get("email") || "",
+          address: fd.get("address"), city: fd.get("city"), state: fd.get("state"),
+          pincode: fd.get("pincode"), landmark: fd.get("landmark") || "", payment_method: method,
+          items: PNW.getCart().map(function (i) { return { id: i.id, size: i.size, qty: i.qty }; })
+        };
+        window.PNW_API.placeOrder(payload).then(function (order) {
+          if (method === "Razorpay") {
+            return window.PNW_API.createRazorpay(order.id).then(function (pr) {
+              var rz = new Razorpay({
+                key: pr.key_id, amount: pr.amount, currency: pr.currency,
+                name: "PrimeNutra Wellness", description: "Order " + order.id, order_id: pr.razorpay_order_id,
+                prefill: { name: order.customer_name, contact: order.phone, email: order.email },
+                theme: { color: "#1b6b3c" },
+                handler: function (resp) {
+                  window.PNW_API.verifyRazorpay({
+                    order_id: order.id, razorpay_order_id: resp.razorpay_order_id,
+                    razorpay_payment_id: resp.razorpay_payment_id, razorpay_signature: resp.razorpay_signature
+                  }).then(function () {
+                    successScreen(order.customer_name, order.id, order.total, "Paid online", order.phone);
+                  }).catch(function () { alert("Payment verification failed. Please contact support with order " + order.id); });
+                },
+                modal: { ondismiss: function () {
+                  if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Place Order"; }
+                  PNW.toast("Payment cancelled — order " + order.id + " saved as pending");
+                } }
+              });
+              rz.open();
+            });
+          }
+          successScreen(order.customer_name, order.id, order.total, "COD", order.phone);
+        }).catch(function () { localFallback(); });
       });
-    }
-    render();
+    };
+    window.pageRender();
   </script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="js/api.js"></script>
 </body>
 </html>

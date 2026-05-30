@@ -93,7 +93,7 @@
         '<a class="card__media" style="background:' + window.catBg(p.category) + '" href="product.html?id=' + p.id + '">' +
           (p.badge ? '<span class="card__badge">' + p.badge + "</span>" : "") +
           (disc > 0 ? '<span class="card__disc">' + disc + "% OFF</span>" : "") +
-          '<span class="em">' + p.emoji + "</span>" +
+          (p.image ? '<img class="card__img" src="' + p.image + '" alt="' + p.name + '" loading="lazy">' : '<span class="em">' + p.emoji + "</span>") +
         "</a>" +
         '<button class="card__wish' + wished + '" data-wish="' + p.id + '" onclick="toggleWish(\'' + p.id + '\')" aria-label="wishlist">♥</button>' +
         '<div class="card__body">' +
@@ -256,6 +256,10 @@
 
     renderCart(); updateCounts();
   }
+
+  // expose so the optional backend layer (api.js) can rebuild the menus
+  // after it loads the live, admin-managed catalog
+  window.PNW_initChrome = init;
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
