@@ -1,0 +1,87 @@
+/* PrimeNutra Wellness — product catalogue
+ * Health & organic e-commerce data (inspired by leading organic brands).
+ * Prices in INR. No external image dependencies — each product renders a
+ * styled tile (emoji + category colour) so nothing ever appears broken.
+ */
+
+const CATEGORIES = [
+  { id: "teas", name: "Herbal Teas & Infusions", emoji: "🍵", blurb: "Tulsi, green & wellness teas" },
+  { id: "supplements", name: "Herbal Supplements", emoji: "💊", blurb: "Ayurvedic capsules & tablets" },
+  { id: "superfoods", name: "Superfoods & Powders", emoji: "🌿", blurb: "Moringa, wheatgrass, amla & more" },
+  { id: "foods", name: "Healthy Foods", emoji: "🍯", blurb: "Honey, ghee, oils & grains" },
+  { id: "personalcare", name: "Personal Care", emoji: "🧴", blurb: "Natural skin & body care" },
+  { id: "combos", name: "Combos & Wellness Kits", emoji: "🎁", blurb: "Curated value bundles" },
+];
+
+const CONCERNS = [
+  { id: "gut", name: "Gut Care", emoji: "🌱", blurb: "Digestion, colon cleanse & gut flora" },
+  { id: "immunity", name: "Immunity Care", emoji: "🛡️", blurb: "Daily defence & resilience" },
+  { id: "heart", name: "Heart Care", emoji: "❤️", blurb: "Cholesterol & circulation support" },
+  { id: "joint", name: "Joint Care", emoji: "🦵", blurb: "Mobility, bones & flexibility" },
+  { id: "men", name: "Men's Health", emoji: "🧔", blurb: "Vitality, stamina & strength" },
+  { id: "women", name: "Women's Health", emoji: "👩", blurb: "Hormonal & cycle wellness" },
+  { id: "sleep", name: "Sleep & Stress", emoji: "🌙", blurb: "Calm, relaxation & rest" },
+  { id: "metabolism", name: "Metabolism & Weight", emoji: "⚖️", blurb: "Healthy weight & energy" },
+  { id: "nutrition", name: "Nutrition Support", emoji: "🥗", blurb: "Everyday vitamins & minerals" },
+  { id: "energy", name: "Energy & Vitality", emoji: "⚡", blurb: "Stamina, focus & endurance" },
+];
+
+const PRODUCTS = [
+  // ---------- Teas ----------
+  { id: "tulsi-green-classic", name: "Tulsi Green Tea Classic", category: "teas", concerns: ["immunity","metabolism","heart"], price: 199, mrp: 240, rating: 4.7, reviews: 1240, emoji: "🍵", badge: "Bestseller", sizes: ["25 Teabags","50 Teabags","100g Tin"], desc: "A soothing blend of holy basil (tulsi) and green tea leaves that supports immunity and metabolism while helping you unwind.", benefits: ["Rich in antioxidants","Supports daily immunity","Aids metabolism"] },
+  { id: "tulsi-lemon-ginger", name: "Tulsi Lemon Ginger Tea", category: "teas", concerns: ["immunity","gut","energy"], price: 200, mrp: 250, rating: 4.6, reviews: 870, emoji: "🍋", badge: "20% OFF", sizes: ["25 Teabags","50 Teabags"], desc: "Zesty lemon and warming ginger meet sacred tulsi for a refreshing, immunity-boosting cup.", benefits: ["Soothes the throat","Warming & refreshing","Supports digestion"] },
+  { id: "tulsi-ashwagandha-tea", name: "Tulsi Ashwagandha Tea", category: "teas", concerns: ["sleep","energy","women"], price: 216, mrp: 260, rating: 4.5, reviews: 540, emoji: "🌾", sizes: ["25 Teabags"], desc: "Adaptogenic ashwagandha blended with tulsi to help your body manage stress and feel balanced.", benefits: ["Helps manage stress","Promotes calm","Restorative blend"] },
+  { id: "chamomile-tea", name: "Simply Chamomile Tea", category: "teas", concerns: ["sleep"], price: 220, mrp: 275, rating: 4.6, reviews: 410, emoji: "🌼", badge: "20% OFF", sizes: ["25 Teabags","25 Teabags x2"], desc: "Caffeine-free chamomile flowers for a gentle, relaxing wind-down before bed.", benefits: ["Caffeine free","Promotes restful sleep","Calming aroma"] },
+  { id: "moringa-hibiscus-tea", name: "Moringa Hibiscus Tea", category: "teas", concerns: ["heart","metabolism","nutrition"], price: 230, mrp: 280, rating: 4.4, reviews: 260, emoji: "🌺", sizes: ["25 Teabags"], desc: "Nutrient-dense moringa paired with tangy hibiscus to support heart health and metabolism.", benefits: ["Heart friendly","Loaded with nutrients","Naturally tangy"] },
+  { id: "tulsi-honey-lemon", name: "Tulsi Green Tea Honey Lemon", category: "teas", concerns: ["immunity","metabolism"], price: 216, mrp: 240, rating: 4.5, reviews: 320, emoji: "🍯", sizes: ["25 Teabags"], desc: "A naturally sweet honey-lemon tulsi green tea for a delicious daily ritual.", benefits: ["Naturally sweet","Antioxidant rich","Everyday wellness"] },
+
+  // ---------- Supplements ----------
+  { id: "ashwagandha-caps", name: "Ashwagandha Capsules", category: "supplements", concerns: ["sleep","men","energy"], price: 240, mrp: 320, rating: 4.7, reviews: 2100, emoji: "💊", badge: "Bestseller", sizes: ["60 Capsules","60 Capsules x2","180 Capsules"], desc: "Premium KSM-style ashwagandha root to help the body adapt to stress, support stamina and restful sleep.", benefits: ["Reduces stress & fatigue","Supports stamina","Improves sleep quality"] },
+  { id: "shilajit-resin", name: "Pure Himalayan Shilajit", category: "supplements", concerns: ["men","energy","immunity"], price: 699, mrp: 999, rating: 4.6, reviews: 980, emoji: "🪨", badge: "Premium", sizes: ["20g","20g x2"], desc: "Lab-tested Himalayan shilajit resin rich in fulvic acid for energy, vitality and strength.", benefits: ["Boosts energy & vitality","Rich in fulvic acid","Supports performance"] },
+  { id: "triphala-caps", name: "Triphala Capsules", category: "supplements", concerns: ["gut","immunity"], price: 258, mrp: 290, rating: 4.5, reviews: 760, emoji: "🟤", sizes: ["60 Capsules","60 Capsules x2","180 Capsules"], desc: "The classic three-fruit Ayurvedic blend for gentle detox and healthy digestion.", benefits: ["Supports digestion","Gentle detox","Promotes regularity"] },
+  { id: "moringa-caps", name: "Moringa Capsules", category: "supplements", concerns: ["nutrition","immunity","energy"], price: 199, mrp: 265, rating: 4.5, reviews: 640, emoji: "🌿", badge: "24% OFF", sizes: ["60 Capsules","60 Capsules x2"], desc: "Whole-leaf moringa packed with vitamins, minerals and antioxidants in a convenient capsule.", benefits: ["Multivitamin from nature","Supports immunity","Daily nutrition"] },
+  { id: "liver-kidney-care", name: "Liver Kidney Care", category: "supplements", concerns: ["gut","immunity"], price: 214, mrp: 267, rating: 4.4, reviews: 430, emoji: "💊", sizes: ["60 Capsules","180 Capsules"], desc: "Herbal blend that supports natural liver and kidney detoxification.", benefits: ["Supports detox","Liver & kidney health","Ayurvedic herbs"] },
+  { id: "prostate-care", name: "Prostate Care Capsules", category: "supplements", concerns: ["men"], price: 214, mrp: 267, rating: 4.3, reviews: 210, emoji: "🧔", sizes: ["60 Capsules","60 Capsules x2"], desc: "Targeted herbal support for prostate and urinary health in men.", benefits: ["Prostate support","Urinary comfort","Men's wellness"] },
+  { id: "joint-care", name: "Joint & Bone Care", category: "supplements", concerns: ["joint"], price: 279, mrp: 340, rating: 4.4, reviews: 350, emoji: "🦵", sizes: ["60 Capsules","180 Capsules"], desc: "Boswellia, turmeric and ashwagandha to support joint flexibility and bone strength.", benefits: ["Joint flexibility","Bone strength","Eases stiffness"] },
+  { id: "women-wellness", name: "Women's Wellness Capsules", category: "supplements", concerns: ["women"], price: 269, mrp: 330, rating: 4.4, reviews: 290, emoji: "👩", sizes: ["60 Capsules"], desc: "Shatavari-based blend supporting hormonal balance and women's vitality.", benefits: ["Hormonal balance","Supports vitality","Shatavari rich"] },
+  { id: "garcinia-caps", name: "Garcinia Cambogia Capsules", category: "supplements", concerns: ["metabolism"], price: 270, mrp: 300, rating: 4.2, reviews: 180, emoji: "⚖️", sizes: ["60 Capsules"], desc: "Garcinia cambogia to support healthy weight management alongside diet and exercise.", benefits: ["Weight management","Curbs cravings","Natural extract"] },
+  { id: "weight-balance", name: "Weight Balance Capsules", category: "supplements", concerns: ["metabolism"], price: 261, mrp: 290, rating: 4.2, reviews: 160, emoji: "⚖️", sizes: ["60 Capsules","180 Capsules"], desc: "Herbal metabolism support to complement an active, healthy lifestyle.", benefits: ["Supports metabolism","Herbal formula","Daily use"] },
+  { id: "bowelcare-caps", name: "Bowelcare Capsules", category: "supplements", concerns: ["gut"], price: 248, mrp: 267, rating: 4.3, reviews: 220, emoji: "🌱", sizes: ["60 Capsules","180 Capsules"], desc: "Gentle herbal support for regularity and a healthy digestive tract.", benefits: ["Promotes regularity","Gentle on gut","Ayurvedic blend"] },
+  { id: "heart-care", name: "Heart Care Capsules", category: "supplements", concerns: ["heart"], price: 289, mrp: 360, rating: 4.4, reviews: 240, emoji: "❤️", sizes: ["60 Capsules"], desc: "Arjuna and herbal extracts to support healthy heart function and cholesterol levels.", benefits: ["Supports heart health","Arjuna based","Cholesterol balance"] },
+
+  // ---------- Superfoods ----------
+  { id: "moringa-powder", name: "Organic Moringa Powder", category: "superfoods", concerns: ["nutrition","immunity","energy"], price: 412, mrp: 550, rating: 4.7, reviews: 1530, emoji: "🌿", badge: "Bestseller", sizes: ["100g","100g x2","200g"], desc: "Cold-dried moringa leaf powder — a natural multivitamin to add to smoothies and meals.", benefits: ["Plant protein & iron","Antioxidant rich","Versatile superfood"] },
+  { id: "wheatgrass-powder", name: "Wheatgrass Powder", category: "superfoods", concerns: ["nutrition","gut","immunity"], price: 357, mrp: 425, rating: 4.4, reviews: 410, emoji: "🌾", sizes: ["100g"], desc: "Nutrient-dense wheatgrass to support detox, energy and everyday nutrition.", benefits: ["Natural detox","Chlorophyll rich","Daily greens"] },
+  { id: "amla-powder", name: "Organic Amla Powder", category: "superfoods", concerns: ["immunity","gut","women"], price: 239, mrp: 299, rating: 4.5, reviews: 520, emoji: "🟢", sizes: ["200g"], desc: "Vitamin-C powerhouse amla (Indian gooseberry) for immunity, hair and skin.", benefits: ["Loaded with Vitamin C","Immunity & skin","Hair health"] },
+  { id: "spirulina-powder", name: "Spirulina Powder", category: "superfoods", concerns: ["nutrition","energy","immunity"], price: 449, mrp: 599, rating: 4.5, reviews: 380, emoji: "🟩", badge: "New", sizes: ["100g","250g"], desc: "Blue-green algae rich in plant protein, iron and B-vitamins for sustained energy.", benefits: ["High plant protein","Iron & B-vitamins","Sustained energy"] },
+  { id: "triphala-powder", name: "Triphala Powder", category: "superfoods", concerns: ["gut"], price: 204, mrp: 240, rating: 4.4, reviews: 230, emoji: "🟤", sizes: ["100g"], desc: "Traditional three-fruit powder for digestion and gentle internal cleansing.", benefits: ["Digestive support","Gentle cleanse","Time-tested"] },
+  { id: "psyllium-husk", name: "Psyllium Whole Husk (Isabgol)", category: "superfoods", concerns: ["gut","heart"], price: 213, mrp: 260, rating: 4.5, reviews: 690, emoji: "🌾", badge: "18% OFF", sizes: ["100g","100g x2","100g x3"], desc: "Soluble fibre that supports digestion, regularity and healthy cholesterol.", benefits: ["High soluble fibre","Supports regularity","Heart friendly"] },
+
+  // ---------- Healthy Foods ----------
+  { id: "multifloral-honey", name: "Raw Multi-Floral Honey", category: "foods", concerns: ["immunity","nutrition"], price: 207, mrp: 235, rating: 4.6, reviews: 980, emoji: "🍯", badge: "Bestseller", sizes: ["250g","500g"], desc: "Pure, unprocessed multi-floral honey straight from the hive — no added sugar.", benefits: ["100% raw & pure","No added sugar","Natural energy"] },
+  { id: "cow-ghee", name: "A2 Cow Ghee", category: "foods", concerns: ["nutrition","joint","immunity"], price: 638, mrp: 899, rating: 4.7, reviews: 1120, emoji: "🧈", badge: "29% OFF", sizes: ["500ml","1 Litre"], desc: "Hand-churned A2 cow ghee made the traditional bilona way for rich flavour and nourishment.", benefits: ["Traditional bilona method","Rich in good fats","Aids digestion"] },
+  { id: "coconut-oil", name: "Virgin Coconut Oil", category: "foods", concerns: ["nutrition","metabolism"], price: 607, mrp: 799, rating: 4.5, reviews: 640, emoji: "🥥", sizes: ["500ml","500ml x2"], desc: "Cold-pressed virgin coconut oil for cooking, skin and hair.", benefits: ["Cold-pressed","Multi-purpose","Naturally pure"] },
+  { id: "quinoa", name: "Organic Quinoa", category: "foods", concerns: ["nutrition","metabolism"], price: 266, mrp: 295, rating: 4.4, reviews: 300, emoji: "🌾", sizes: ["500g"], desc: "Protein-rich, gluten-free quinoa — a wholesome base for healthy meals.", benefits: ["Complete protein","Gluten free","Wholesome grain"] },
+  { id: "flax-seeds", name: "Roasted Flax Seeds", category: "foods", concerns: ["heart","gut","women"], price: 175, mrp: 220, rating: 4.4, reviews: 210, emoji: "🟫", badge: "New", sizes: ["200g","500g"], desc: "Omega-3 rich roasted flax seeds — a crunchy boost for heart and gut health.", benefits: ["Omega-3 fatty acids","High fibre","Heart friendly"] },
+  { id: "chyawanprash", name: "Herbal Chyawanprash", category: "foods", concerns: ["immunity","energy","nutrition"], price: 299, mrp: 380, rating: 4.6, reviews: 720, emoji: "🫙", sizes: ["500g","1kg"], desc: "Time-honoured amla-based herbal jam to strengthen immunity and vitality.", benefits: ["Builds immunity","40+ herbs","Daily vitality"] },
+
+  // ---------- Personal Care ----------
+  { id: "neem-facewash", name: "Neem & Tulsi Face Wash", category: "personalcare", concerns: ["immunity"], price: 199, mrp: 250, rating: 4.3, reviews: 180, emoji: "🧴", sizes: ["100ml","200ml"], desc: "Gentle neem and tulsi face wash for clear, refreshed skin.", benefits: ["Purifies skin","Neem & tulsi","Daily cleanse"] },
+  { id: "aloe-gel", name: "Pure Aloe Vera Gel", category: "personalcare", concerns: ["immunity"], price: 175, mrp: 225, rating: 4.4, reviews: 260, emoji: "🌵", sizes: ["150ml","300ml"], desc: "Multi-purpose aloe vera gel to soothe and hydrate skin and hair.", benefits: ["Soothes & hydrates","Skin & hair","Pure aloe"] },
+  { id: "herbal-hairoil", name: "Ayurvedic Herbal Hair Oil", category: "personalcare", concerns: ["women"], price: 249, mrp: 320, rating: 4.5, reviews: 340, emoji: "💧", sizes: ["100ml","200ml"], desc: "Bhringraj and amla infused hair oil to nourish roots and reduce hair fall.", benefits: ["Reduces hair fall","Nourishes roots","Bhringraj & amla"] },
+
+  // ---------- Combos & Kits ----------
+  { id: "wellness-starter", name: "Wellness Starter Pack", category: "combos", concerns: ["immunity","nutrition","energy"], price: 1084, mrp: 1232, rating: 4.7, reviews: 510, emoji: "🎁", badge: "12% OFF", sizes: ["1 Combo"], desc: "Tulsi tea, moringa, honey, ashwagandha & amalaki — everything to begin your wellness journey.", benefits: ["5 wellness essentials","Great value","Perfect gift"] },
+  { id: "clean7-kit", name: "Clean 7-Day Detox Kit", category: "combos", concerns: ["gut","metabolism"], price: 3797, mrp: 4219, rating: 4.6, reviews: 230, emoji: "🧺", badge: "Kit", sizes: ["1 Kit"], desc: "A guided 7-day cleanse kit to reset digestion and kick-start healthy habits.", benefits: ["Guided 7-day plan","Gut reset","Complete kit"] },
+  { id: "calm-balance-combo", name: "Calm & Balance Combo", category: "combos", concerns: ["sleep","energy"], price: 1656, mrp: 1904, rating: 4.6, reviews: 190, emoji: "🌙", badge: "13% OFF", sizes: ["1 Combo"], desc: "Tulsi ashwagandha tea, ashwagandha & shilajit to help you stay calm and energised.", benefits: ["Stress & sleep support","Energy & calm","Value combo"] },
+  { id: "gut-reset-combo", name: "Gut Reset Combo", category: "combos", concerns: ["gut"], price: 711, mrp: 790, rating: 4.5, reviews: 170, emoji: "🌱", badge: "10% OFF", sizes: ["1 Combo"], desc: "Tulsi green tea, triphala capsules & psyllium husk for a complete gut reset.", benefits: ["Digestion & detox","3-in-1 combo","Everyday gut care"] },
+  { id: "immunity-combo", name: "Daily Immunity Combo", category: "combos", concerns: ["immunity"], price: 899, mrp: 1099, rating: 4.6, reviews: 280, emoji: "🛡️", badge: "Bestseller", sizes: ["1 Combo"], desc: "Chyawanprash, amla powder & tulsi tea to build everyday immunity.", benefits: ["Triple immunity boost","Family friendly","Great value"] },
+];
+
+// Helpers
+function discountPct(p) { return Math.round(((p.mrp - p.price) / p.mrp) * 100); }
+function categoryName(id) { const c = CATEGORIES.find(c => c.id === id); return c ? c.name : id; }
+function concernName(id) { const c = CONCERNS.find(c => c.id === id); return c ? c.name : id; }
+function getProduct(id) { return PRODUCTS.find(p => p.id === id); }
+
+if (typeof module !== "undefined") { module.exports = { PRODUCTS, CATEGORIES, CONCERNS }; }

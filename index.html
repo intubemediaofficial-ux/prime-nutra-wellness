@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PrimeNutra Wellness – Organic Herbal Supplements, Teas & Superfoods</title>
+  <meta name="description" content="Shop certified-organic herbal supplements, tulsi teas, superfoods, honey, ghee and wellness combos. Free delivery across India, COD available. Live healthier, naturally." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%BF%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container hero__grid">
+      <div>
+        <span class="eyebrow">Certified Organic · Ayurvedic</span>
+        <h1>Pure Nutrition for a <span>Healthier You</span></h1>
+        <p>Discover lab-tested herbal supplements, tulsi teas, superfoods and wellness kits — crafted from nature to support your everyday health goals.</p>
+        <div class="hero__cta">
+          <a class="btn btn--primary" href="shop.html">Shop All Products</a>
+          <a class="btn btn--ghost" href="#concerns">Shop by Health Goal</a>
+        </div>
+        <div class="hero__stats">
+          <div><b>100%</b><span>Certified Organic</span></div>
+          <div><b>50k+</b><span>Happy Customers</span></div>
+          <div><b>4.7★</b><span>Average Rating</span></div>
+        </div>
+      </div>
+      <div class="hero__art">
+        <span class="leaf">🌿</span>
+        <span class="hero__chip c1">🛡️ Boosts Immunity</span>
+        <span class="hero__chip c2">🌱 100% Natural</span>
+        <span class="hero__chip c3">🚚 Free Delivery</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust strip -->
+  <section class="trust">
+    <div class="container trust__grid">
+      <div><span class="em">🚚</span><span>Free Delivery across India</span></div>
+      <div><span class="em">💵</span><span>Cash on Delivery</span></div>
+      <div><span class="em">🌿</span><span>100% Certified Organic</span></div>
+      <div><span class="em">🔁</span><span>Easy 7-Day Returns</span></div>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Browse</span><h2>Shop by Category</h2><p>Everything you need for a natural, healthy lifestyle.</p></div>
+      <div class="tiles" id="categoryTiles"></div>
+    </div>
+  </section>
+
+  <!-- Shop by Health Concern -->
+  <section class="section section--tight" id="concerns" style="background:var(--green-50)">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Targeted Wellness</span><h2>Shop by Health Concern</h2><p>Find products tailored to your specific health goals.</p></div>
+      <div class="tiles tiles--concern" id="concernTiles"></div>
+    </div>
+  </section>
+
+  <!-- Best Sellers -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Customer Favourites</span><h2>Our Best Sellers</h2><p>Loved by thousands across India.</p></div>
+      <div class="grid" id="bestSellers"></div>
+      <div class="cta-center"><a class="btn btn--ghost" href="shop.html">View All Products</a></div>
+    </div>
+  </section>
+
+  <!-- Promo banner -->
+  <section class="section--tight">
+    <div class="container">
+      <div class="promo">
+        <div>
+          <span class="eyebrow" style="color:#eafff1">Limited Time</span>
+          <h2>Get up to 12% OFF + a Free Gift</h2>
+          <p>On orders above ₹1599. Stock up on your wellness essentials and save more.</p>
+          <a class="btn btn--amber" href="shop.html?category=combos">Shop Combos &amp; Kits</a>
+        </div>
+        <div class="art">🎁</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Shop by Goal / Combos -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Curated Bundles</span><h2>Shop by Goal — Combos &amp; Kits</h2><p>Save more with our specially curated wellness bundles.</p></div>
+      <div class="grid" id="combos"></div>
+    </div>
+  </section>
+
+  <!-- Why us -->
+  <section class="section" style="background:var(--green-50)">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">The PrimeNutra Promise</span><h2>Why Choose Us</h2></div>
+      <div class="why">
+        <div class="why__item"><span class="em">🌱</span><b>Certified Organic</b><p>Sourced from certified organic farms with no chemicals or pesticides.</p></div>
+        <div class="why__item"><span class="em">🔬</span><b>Lab Tested</b><p>Every batch is tested for purity, potency and safety.</p></div>
+        <div class="why__item"><span class="em">♻️</span><b>Eco Packaging</b><p>Sustainable, recyclable packaging that's kind to the planet.</p></div>
+        <div class="why__item"><span class="em">👩‍⚕️</span><b>Expert Formulated</b><p>Ayurvedic recipes crafted with modern nutrition science.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Real Results</span><h2>What Our Customers Say</h2></div>
+      <div class="reviews">
+        <div class="review"><div class="stars">★★★★★</div><p>"The Ashwagandha capsules genuinely helped my sleep and stress levels within a few weeks. Quality is top notch!"</p><div class="who"><span class="av">A</span><div><b>Anjali R.</b><span>Verified Buyer · Delhi</span></div></div></div>
+        <div class="review"><div class="stars">★★★★★</div><p>"Tulsi green tea has become my daily ritual. Fresh, aromatic and you can taste the purity. Fast delivery too."</p><div class="who"><span class="av">R</span><div><b>Rahul M.</b><span>Verified Buyer · Mumbai</span></div></div></div>
+        <div class="review"><div class="stars">★★★★★</div><p>"Switched to their A2 cow ghee and moringa powder for the whole family. Wonderful quality and great prices."</p><div class="who"><span class="av">S</span><div><b>Sneha K.</b><span>Verified Buyer · Jaipur</span></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="section--tight">
+    <div class="container">
+      <div class="news">
+        <h2>Join the Wellness Club 🌿</h2>
+        <p>Get health tips, exclusive offers and 10% off your first order.</p>
+        <form onsubmit="event.preventDefault(); PNW.toast('Thanks for subscribing! Check your inbox for 10% off.'); this.reset();">
+          <input type="email" placeholder="Enter your email" required />
+          <button class="btn btn--amber" type="submit">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+
+  <script src="js/products.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Category & concern tiles
+    document.getElementById("categoryTiles").innerHTML = CATEGORIES.map(function (c) {
+      return '<a class="tile" href="shop.html?category=' + c.id + '"><span class="em">' + c.emoji + '</span><b>' + c.name + '</b><span>' + c.blurb + '</span></a>';
+    }).join("");
+    document.getElementById("concernTiles").innerHTML = CONCERNS.map(function (c) {
+      return '<a class="tile" href="shop.html?concern=' + c.id + '"><span class="em">' + c.emoji + '</span><b>' + c.name + '</b><span>' + c.blurb + '</span></a>';
+    }).join("");
+    // Best sellers + combos
+    renderGrid("#bestSellers", PRODUCTS.filter(function (p) { return p.badge === "Bestseller"; }).slice(0, 8));
+    renderGrid("#combos", PRODUCTS.filter(function (p) { return p.category === "combos"; }));
+  </script>
+</body>
+</html>

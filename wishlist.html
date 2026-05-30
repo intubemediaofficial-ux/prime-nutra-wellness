@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Wishlist – PrimeNutra Wellness</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%BF%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="page-hero">
+    <div class="container"><h1>My Wishlist</h1><div class="breadcrumb"><a href="index.html">Home</a> / Wishlist</div></div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="grid" id="wishGrid"></div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+  <script src="js/products.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    function renderWish() {
+      var ids = PNW.getWish();
+      var list = PRODUCTS.filter(function (p) { return ids.indexOf(p.id) > -1; });
+      var el = document.getElementById("wishGrid");
+      if (!list.length) {
+        el.innerHTML = '<div class="empty" style="grid-column:1/-1">Your wishlist is empty ♥<br><br><a class="btn btn--primary" href="shop.html">Browse Products</a></div>';
+      } else {
+        renderGrid("#wishGrid", list);
+      }
+    }
+    renderWish();
+    // re-render when wishlist toggled on this page
+    document.addEventListener("click", function (e) { if (e.target.matches(".card__wish")) setTimeout(renderWish, 50); });
+  </script>
+</body>
+</html>
