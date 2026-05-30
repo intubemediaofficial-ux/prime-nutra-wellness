@@ -36,9 +36,11 @@
         renderGrid("#wishGrid", list);
       }
     }
+    window.pageRender = renderWish;
     renderWish();
     // re-render when wishlist toggled on this page
     document.addEventListener("click", function (e) { if (e.target.matches(".card__wish")) setTimeout(renderWish, 50); });
   </script>
+  <script src="js/api.js"></script>
 </body>
 </html>
