@@ -1,4 +1,5 @@
 import os
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,9 +11,18 @@ from .database import Base, SessionLocal, engine
 from .routers import admin, auth, categories, orders, payments, products
 from .seed import run_seed
 
-Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="PrimeNutra Wellness API", version="1.0.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Create tables + seed (admin, settings, catalog) at runtime startup.
+    # Kept out of import scope so merely importing `app` has no side effects.
+    Base.metadata.create_all(bind=engine)
+    with SessionLocal() as db:
+        run_seed(db)
+    yield
+
+
+app = FastAPI(title="PrimeNutra Wellness API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,10 +31,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Seed DB (admin, settings, catalog) on startup
-with SessionLocal() as db:
-    run_seed(db)
 
 # Routers
 app.include_router(auth.router)
