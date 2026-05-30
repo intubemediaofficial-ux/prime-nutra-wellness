@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact &amp; FAQ – PrimeNutra Wellness</title>
+  <meta name="description" content="Get in touch with PrimeNutra Wellness. Read FAQs about shipping, returns, COD and orders." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%BF%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="page-hero">
+    <div class="container"><h1>Contact Us</h1><div class="breadcrumb"><a href="index.html">Home</a> / Contact</div></div>
+  </section>
+
+  <section class="section">
+    <div class="container checkout">
+      <form id="contactForm">
+        <h3 style="color:var(--green-900);margin-bottom:14px">Send us a message</h3>
+        <div class="field"><label>Name *</label><input required name="name" /></div>
+        <div class="field--row"><div class="field"><label>Email *</label><input required type="email" name="email" /></div>
+        <div class="field"><label>Phone</label><input type="tel" name="phone" /></div></div>
+        <div class="field"><label>Message *</label><textarea required rows="5" name="message"></textarea></div>
+        <button class="btn btn--primary" type="submit">Send Message</button>
+      </form>
+      <aside class="summary">
+        <h3 style="color:var(--green-900);margin-bottom:12px">Reach Us</h3>
+        <p style="font-size:.92rem;color:var(--muted);line-height:2">
+          📍 PrimeNutra Wellness, India<br>
+          📞 <a href="tel:+919999999999">+91 99999 99999</a><br>
+          ✉️ <a href="mailto:care@primenutrawellness.in">care@primenutrawellness.in</a><br>
+          💬 <a href="https://wa.me/919999999999" target="_blank" rel="noopener">Chat on WhatsApp</a><br>
+          🕘 Mon–Sat, 9 AM – 7 PM
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" style="background:var(--green-50)" id="faq">
+    <div class="container" style="max-width:820px">
+      <div class="section-head"><span class="eyebrow">Help Centre</span><h2>Frequently Asked Questions</h2></div>
+      <div id="faqList"></div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+  <script src="js/products.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById("contactForm").addEventListener("submit", function (e) {
+      e.preventDefault(); PNW.toast("Thanks! We'll get back to you within 24 hours."); e.target.reset();
+    });
+    var faqs = [
+      ["Do you deliver across India?", "Yes! We offer free delivery to all serviceable pincodes across India. Orders are usually dispatched within 24–48 hours."],
+      ["Is Cash on Delivery (COD) available?", "Absolutely. COD is available on all orders. You can also pay securely via UPI and online payment."],
+      ["Are your products certified organic?", "Yes. All our products are sourced from certified organic farms and lab-tested for purity, potency and safety."],
+      ["What is your return policy?", "We offer an easy 7-day return policy on unopened products. Reach out to our support team and we'll help you out."],
+      ["How do I track my order?", "Once your order ships, you'll receive an SMS/WhatsApp with tracking details. You can also contact us anytime."],
+      ["Are these products safe for daily use?", "Our supplements are made from natural Ayurvedic ingredients. For specific health conditions or if pregnant, please consult your doctor first."]
+    ];
+    document.getElementById("faqList").innerHTML = faqs.map(function (f) {
+      return '<div class="acc"><button class="acc__q">' + f[0] + '<span>+</span></button><div class="acc__a">' + f[1] + '</div></div>';
+    }).join("");
+    document.querySelectorAll(".acc__q").forEach(function (q) {
+      q.addEventListener("click", function () {
+        var acc = q.parentElement; var open = acc.classList.contains("open");
+        document.querySelectorAll(".acc").forEach(function (a) { a.classList.remove("open"); a.querySelector(".acc__q span").textContent = "+"; });
+        if (!open) { acc.classList.add("open"); q.querySelector("span").textContent = "−"; }
+      });
+    });
+  </script>
+</body>
+</html>

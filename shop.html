@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop – PrimeNutra Wellness</title>
+  <meta name="description" content="Browse all organic herbal supplements, teas, superfoods and wellness combos. Filter by category, health concern and price." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%BF%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="page-hero">
+    <div class="container">
+      <h1 id="shopTitle">Shop All Products</h1>
+      <div class="breadcrumb"><a href="index.html">Home</a> / <span id="crumb">Shop</span></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container shop">
+      <aside class="filters">
+        <h4>Search</h4>
+        <input type="search" id="search" placeholder="Search products..." />
+        <h4>Category</h4>
+        <div id="catFilters"></div>
+        <h4>Health Concern</h4>
+        <div id="concernFilters"></div>
+        <h4>Price</h4>
+        <label><input type="radio" name="price" value="all" checked /> All prices</label>
+        <label><input type="radio" name="price" value="0-250" /> Under ₹250</label>
+        <label><input type="radio" name="price" value="250-500" /> ₹250 – ₹500</label>
+        <label><input type="radio" name="price" value="500-1000" /> ₹500 – ₹1000</label>
+        <label><input type="radio" name="price" value="1000-99999" /> ₹1000 &amp; above</label>
+        <button class="btn btn--ghost btn--block" style="margin-top:16px" id="clearFilters">Clear Filters</button>
+      </aside>
+
+      <div>
+        <div class="shop__bar">
+          <span class="count" id="count">Loading...</span>
+          <label>Sort:
+            <select id="sort">
+              <option value="featured">Featured</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="rating">Top Rated</option>
+              <option value="discount">Biggest Discount</option>
+            </select>
+          </label>
+        </div>
+        <div class="grid" id="productGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+
+  <script src="js/products.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    var params = new URLSearchParams(location.search);
+    var state = {
+      cats: new Set(params.get("category") ? [params.get("category")] : []),
+      concerns: new Set(params.get("concern") ? [params.get("concern")] : []),
+      search: "", price: "all", sort: "featured"
+    };
+
+    // build filter checkboxes
+    document.getElementById("catFilters").innerHTML = CATEGORIES.map(function (c) {
+      return '<label><input type="checkbox" class="f-cat" value="' + c.id + '"' + (state.cats.has(c.id) ? " checked" : "") + ' /> ' + c.emoji + " " + c.name + "</label>";
+    }).join("");
+    document.getElementById("concernFilters").innerHTML = CONCERNS.map(function (c) {
+      return '<label><input type="checkbox" class="f-concern" value="' + c.id + '"' + (state.concerns.has(c.id) ? " checked" : "") + ' /> ' + c.emoji + " " + c.name + "</label>";
+    }).join("");
+
+    // title
+    function updateTitle() {
+      var t = "Shop All Products";
+      if (state.cats.size === 1) t = categoryName([].concat.apply([], [Array.from(state.cats)])[0]);
+      else if (state.concerns.size === 1) t = concernName(Array.from(state.concerns)[0]);
+      document.getElementById("shopTitle").textContent = t;
+      document.getElementById("crumb").textContent = t;
+      document.title = t + " – PrimeNutra Wellness";
+    }
+
+    function apply() {
+      var list = PRODUCTS.filter(function (p) {
+        if (state.cats.size && !state.cats.has(p.category)) return false;
+        if (state.concerns.size && !p.concerns.some(function (c) { return state.concerns.has(c); })) return false;
+        if (state.search && (p.name + " " + p.desc).toLowerCase().indexOf(state.search.toLowerCase()) === -1) return false;
+        if (state.price !== "all") {
+          var b = state.price.split("-"); if (p.price < +b[0] || p.price > +b[1]) return false;
+        }
+        return true;
+      });
+      if (state.sort === "price-low") list.sort(function (a, b) { return a.price - b.price; });
+      else if (state.sort === "price-high") list.sort(function (a, b) { return b.price - a.price; });
+      else if (state.sort === "rating") list.sort(function (a, b) { return b.rating - a.rating; });
+      else if (state.sort === "discount") list.sort(function (a, b) { return discountPct(b) - discountPct(a); });
+      renderGrid("#productGrid", list);
+      document.getElementById("count").textContent = list.length + " product" + (list.length === 1 ? "" : "s") + " found";
+      updateTitle();
+    }
+
+    document.querySelectorAll(".f-cat").forEach(function (el) { el.addEventListener("change", function () { el.checked ? state.cats.add(el.value) : state.cats.delete(el.value); apply(); }); });
+    document.querySelectorAll(".f-concern").forEach(function (el) { el.addEventListener("change", function () { el.checked ? state.concerns.add(el.value) : state.concerns.delete(el.value); apply(); }); });
+    document.getElementById("search").addEventListener("input", function (e) { state.search = e.target.value; apply(); });
+    document.getElementById("sort").addEventListener("change", function (e) { state.sort = e.target.value; apply(); });
+    document.querySelectorAll('input[name="price"]').forEach(function (el) { el.addEventListener("change", function () { state.price = el.value; apply(); }); });
+    document.getElementById("clearFilters").addEventListener("click", function () {
+      state.cats.clear(); state.concerns.clear(); state.search = ""; state.price = "all"; state.sort = "featured";
+      document.querySelectorAll(".f-cat,.f-concern").forEach(function (el) { el.checked = false; });
+      document.getElementById("search").value = ""; document.getElementById("sort").value = "featured";
+      document.querySelector('input[name="price"][value="all"]').checked = true;
+      apply();
+    });
+
+    apply();
+  </script>
+</body>
+</html>
