@@ -1,0 +1,12 @@
+server/.venv
+server/data
+server/uploads
+server/__pycache__
+server/app/__pycache__
+server/app/routers/__pycache__
+.git
+node_modules
+*.pyc
+CNAME
+README.md
+server/ADMIN_TEST_PLAN.md

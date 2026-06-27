@@ -134,3 +134,40 @@ def admin_page(path: str = ""):
 @app.get("/api/health")
 def health():
     return {"status": "ok", "version": "2.0.0"}
+
+
+# ─── Serve storefront (HTML/CSS/JS) ───
+# The storefront files sit one level above `server/`
+STOREFRONT_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", ".."))
+_STOREFRONT_FILES = [
+    "index.html", "shop.html", "product.html", "checkout.html",
+    "about.html", "blog.html", "contact.html", "account.html",
+    "track.html", "wishlist.html",
+]
+
+for _page in _STOREFRONT_FILES:
+    _filepath = os.path.join(STOREFRONT_DIR, _page)
+    if os.path.isfile(_filepath):
+        _route = "/" + _page
+        # Use default param to capture the value at definition time
+        def _make_handler(fp):
+            def _handler():
+                from fastapi.responses import FileResponse
+                return FileResponse(fp)
+            return _handler
+        app.get(_route, include_in_schema=False)(_make_handler(_filepath))
+
+# Mount CSS/JS directories
+for _subdir in ["css", "js", "images"]:
+    _dirpath = os.path.join(STOREFRONT_DIR, _subdir)
+    if os.path.isdir(_dirpath):
+        app.mount("/" + _subdir, StaticFiles(directory=_dirpath), name="storefront_" + _subdir)
+
+# Serve index.html at root
+@app.get("/", include_in_schema=False)
+def root_page():
+    from fastapi.responses import FileResponse
+    index = os.path.join(STOREFRONT_DIR, "index.html")
+    if os.path.isfile(index):
+        return FileResponse(index)
+    return JSONResponse({"message": "PrimeNutra Wellness API", "docs": "/docs"})
