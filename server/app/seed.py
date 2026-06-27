@@ -1,3 +1,4 @@
+"""Seed data — populate database on first run."""
 import json
 import os
 
@@ -5,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from .auth import hash_password
 from .config import DEFAULT_ADMIN_PASSWORD, DEFAULT_ADMIN_USER
+from .database import SessionLocal
 from .models import AdminUser, Category, Concern, Product
 from .utils import ensure_default_settings
 
@@ -16,7 +18,6 @@ def seed_admin(db: Session):
         db.add(AdminUser(
             username=DEFAULT_ADMIN_USER,
             password_hash=hash_password(DEFAULT_ADMIN_PASSWORD),
-            role="admin",
         ))
         db.commit()
 
@@ -51,7 +52,7 @@ def seed_catalog(db: Session):
             price=p.get("price", 0),
             mrp=p.get("mrp", 0),
             rating=p.get("rating", 4.5),
-            reviews=p.get("reviews", 0),
+            reviews_count=p.get("reviews", 0),
             emoji=p.get("emoji", "🌿"),
             badge=p.get("badge", ""),
             description=p.get("desc", ""),
@@ -63,7 +64,12 @@ def seed_catalog(db: Session):
     db.commit()
 
 
-def run_seed(db: Session):
-    ensure_default_settings(db)
-    seed_admin(db)
-    seed_catalog(db)
+def run_seed():
+    """Run seed using own db session."""
+    db = SessionLocal()
+    try:
+        ensure_default_settings(db)
+        seed_admin(db)
+        seed_catalog(db)
+    finally:
+        db.close()

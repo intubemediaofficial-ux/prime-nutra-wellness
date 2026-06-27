@@ -146,6 +146,8 @@
           '<button class="icon-btn" onclick="location.href=\'shop.html\'" aria-label="search">🔍</button>' +
           '<button class="icon-btn" onclick="location.href=\'wishlist.html\'" aria-label="wishlist">♥<span class="badge-count" data-wish-count style="display:none">0</span></button>' +
           '<button class="icon-btn" id="cartBtn" aria-label="cart">🛒<span class="badge-count" data-cart-count style="display:none">0</span></button>' +
+          '<button class="icon-btn auth-login-btn" id="authLoginBtn" onclick="PNW.showLogin()" aria-label="login" title="Login">👤</button>' +
+          '<a class="icon-btn auth-account-btn" id="authAccountBtn" href="account.html" style="display:none" aria-label="account" title="My Account">👤</a>' +
         "</div>" +
       "</div></header>"
     );
@@ -230,6 +232,70 @@
     if (d) d.classList.remove("open"); if (o) o.classList.remove("open");
   }
   window.PNW.openDrawer = openDrawer;
+
+  /* ---------------- OTP Login Modal ---------------- */
+  function showLogin() {
+    // Remove existing modal
+    var old = document.getElementById("loginModal");
+    if (old) old.remove();
+    var modal = document.createElement("div");
+    modal.id = "loginModal";
+    modal.className = "login-modal-bg";
+    modal.innerHTML = '<div class="login-modal">' +
+      '<button class="login-modal__close" onclick="document.getElementById(\'loginModal\').remove()">&times;</button>' +
+      '<h2>🌿 Login / Sign Up</h2>' +
+      '<p>Enter your mobile number to continue</p>' +
+      '<div id="lm_step1">' +
+        '<div class="field"><label>Mobile Number</label><input id="lm_phone" type="tel" maxlength="10" placeholder="e.g. 9876543210"></div>' +
+        '<button class="btn btn--primary btn--block" id="lm_sendOtp">Send OTP</button>' +
+      '</div>' +
+      '<div id="lm_step2" style="display:none">' +
+        '<div class="field"><label>Enter OTP sent to <span id="lm_ph2"></span></label><input id="lm_otp" type="text" maxlength="6" placeholder="6-digit OTP"></div>' +
+        '<button class="btn btn--primary btn--block" id="lm_verify">Verify & Login</button>' +
+        '<button class="btn btn--ghost btn--block" style="margin-top:8px" id="lm_back">Change Number</button>' +
+      '</div>' +
+      '<div id="lm_msg" class="lm_msg"></div>' +
+      '</div>';
+    document.body.appendChild(modal);
+    modal.addEventListener("click", function(e) { if (e.target === modal) modal.remove(); });
+    document.getElementById("lm_sendOtp").onclick = function() {
+      var phone = document.getElementById("lm_phone").value.replace(/\D/g,"");
+      if (phone.length < 10) { document.getElementById("lm_msg").textContent = "Enter valid 10-digit number"; return; }
+      document.getElementById("lm_msg").textContent = "Sending OTP...";
+      window.PNW_AUTH.sendOTP(phone).then(function(r) {
+        document.getElementById("lm_step1").style.display = "none";
+        document.getElementById("lm_step2").style.display = "";
+        document.getElementById("lm_ph2").textContent = phone;
+        document.getElementById("lm_msg").textContent = r.otp ? "Dev OTP: " + r.otp : "OTP sent!";
+        document.getElementById("lm_otp").focus();
+      }).catch(function(e) {
+        document.getElementById("lm_msg").textContent = e.message;
+      });
+    };
+    document.getElementById("lm_verify").onclick = function() {
+      var phone = document.getElementById("lm_phone").value.replace(/\D/g,"");
+      var code = document.getElementById("lm_otp").value.trim();
+      if (code.length < 4) { document.getElementById("lm_msg").textContent = "Enter OTP"; return; }
+      document.getElementById("lm_msg").textContent = "Verifying...";
+      window.PNW_AUTH.verifyOTP(phone, code).then(function(r) {
+        document.getElementById("lm_msg").textContent = "Login successful!";
+        setTimeout(function() {
+          modal.remove();
+          if (typeof window.updateAuthUI === "function") window.updateAuthUI();
+          toast("Welcome" + (r.name ? ", " + r.name : "") + "!");
+        }, 500);
+      }).catch(function(e) {
+        document.getElementById("lm_msg").textContent = e.message;
+      });
+    };
+    document.getElementById("lm_back").onclick = function() {
+      document.getElementById("lm_step1").style.display = "";
+      document.getElementById("lm_step2").style.display = "none";
+      document.getElementById("lm_msg").textContent = "";
+    };
+    document.getElementById("lm_phone").focus();
+  }
+  window.PNW.showLogin = showLogin;
 
   /* ---------------- init ---------------- */
   function init() {

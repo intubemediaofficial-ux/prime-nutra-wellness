@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Order – PrimeNutra Wellness</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%BF%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <div class="track-wrap">
+    <h1>Track Your Order</h1>
+    <div id="trackSearch" style="margin-bottom:20px">
+      <div class="field"><label>Order ID</label><input id="trk_oid" placeholder="Enter order ID"></div>
+      <div class="field"><label>Phone Number</label><input id="trk_phone" type="tel" placeholder="Phone used during order"></div>
+      <button class="btn btn--primary" id="trkBtn">Track</button>
+    </div>
+    <div id="trackResult"></div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="js/products.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+  (function() {
+    var params = new URLSearchParams(location.search);
+    var oid = params.get("id") || "";
+    if (oid) {
+      document.getElementById("trk_oid").value = oid;
+      // If logged in, auto-track
+      if (window.PNW_AUTH && window.PNW_AUTH.isLoggedIn()) {
+        var c = window.PNW_AUTH.customer();
+        if (c && c.phone) {
+          document.getElementById("trk_phone").value = c.phone;
+          doTrack(oid, c.phone);
+        }
+      }
+    }
+
+    document.getElementById("trkBtn").onclick = function() {
+      var id = document.getElementById("trk_oid").value.trim();
+      var ph = document.getElementById("trk_phone").value.replace(/\D/g,"");
+      if (!id || !ph) { PNW.toast("Enter order ID and phone"); return; }
+      doTrack(id, ph);
+    };
+
+    function formatINR(n) { return "\u20B9" + Number(n).toLocaleString("en-IN"); }
+
+    function doTrack(id, phone) {
+      var el = document.getElementById("trackResult");
+      el.innerHTML = "<p>Loading...</p>";
+      window.PNW_API.trackOrder(id, phone).then(function(o) {
+        var statusOrder = ["placed","confirmed","packed","dispatched","in_transit","out_for_delivery","delivered"];
+        var currentIdx = statusOrder.indexOf(o.status);
+        if (currentIdx < 0) currentIdx = -1;
+
+        var timeline = '<div class="timeline">';
+        // Show actual status logs if available
+        if (o.status_logs && o.status_logs.length) {
+          o.status_logs.forEach(function(log) {
+            timeline += '<div class="timeline-item active">' +
+              '<b>' + log.status + '</b>' +
+              (log.note ? '<p>' + log.note + '</p>' : '') +
+              '<p class="ts">' + (log.created_at||"").replace("T"," ").substr(0,19) + '</p>' +
+              '</div>';
+          });
+        } else {
+          statusOrder.forEach(function(s, i) {
+            var active = i <= currentIdx ? " active" : "";
+            timeline += '<div class="timeline-item' + active + '"><b>' + s.replace(/_/g," ") + '</b></div>';
+          });
+        }
+        timeline += '</div>';
+
+        el.innerHTML = '<div class="account-card">' +
+          '<h3>Order #' + o.id.substr(0,8) + '</h3>' +
+          '<p>Status: <b>' + o.status + '</b></p>' +
+          '<p>Total: ' + formatINR(o.total) + '</p>' +
+          '<p>Payment: ' + o.payment_method + '</p>' +
+          (o.courier ? '<p>Courier: ' + o.courier + '</p>' : '') +
+          (o.tracking_number ? '<p>Tracking #: ' + o.tracking_number + '</p>' : '') +
+          (o.tracking_url ? '<p><a href="' + o.tracking_url + '" target="_blank" class="btn btn--ghost btn--sm">Track on Courier Site</a></p>' : '') +
+          (o.estimated_delivery ? '<p>Est. Delivery: ' + o.estimated_delivery + '</p>' : '') +
+          '</div>' +
+          '<h2 style="margin:20px 0 10px">Status Timeline</h2>' + timeline;
+      }).catch(function(e) {
+        el.innerHTML = '<p style="color:red">' + e.message + '</p>';
+      });
+    }
+  })();
+  </script>
+  <script src="js/api.js"></script>
+</body>
+</html>

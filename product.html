@@ -79,6 +79,55 @@
         wa.href = "https://wa.me/919999999999?text=" + encodeURIComponent("Hi PrimeNutra, I'd like to order: " + p.name + " (" + state.size + ") x" + state.qty);
       }
       render();
+      // Track recently viewed
+      if (window.PNW_AUTH && window.PNW_AUTH.isLoggedIn() && window.PNW_ACCOUNT) {
+        try { window.PNW_ACCOUNT.trackRecentlyViewed(p.id); } catch(e){}
+      }
+      // Load reviews from server
+      if (window.PNW_API && window.PNW_API.getProductReviews) {
+        window.PNW_API.getProductReviews(p.id).then(function(reviews) {
+          if (!reviews || !reviews.length) return;
+          var el = document.getElementById("reviewsSection");
+          if (!el) {
+            el = document.createElement("div");
+            el.id = "reviewsSection";
+            el.style.marginTop = "24px";
+            pd.parentElement.appendChild(el);
+          }
+          el.innerHTML = '<h3 style="margin-bottom:12px">Customer Reviews</h3>' +
+            reviews.map(function(r) {
+              return '<div class="account-card"><b>' + "★".repeat(r.rating) + '</b>' +
+                (r.title ? ' <b>' + r.title + '</b>' : '') +
+                (r.verified_purchase ? ' <span class="pill green">Verified</span>' : '') +
+                '<p>' + (r.body||"") + '</p>' +
+                '<p class="ts">' + (r.created_at||"").substr(0,10) + '</p></div>';
+            }).join("");
+        }).catch(function(){});
+      }
+      // Load combo suggestions
+      if (window.PNW_API && window.PNW_API.getCombos) {
+        window.PNW_API.getCombos(p.id).then(function(combos) {
+          if (!combos || !combos.length) return;
+          var el = document.getElementById("comboSuggestions");
+          if (!el) {
+            el = document.createElement("div");
+            el.id = "comboSuggestions";
+            el.style.cssText = "margin-top:20px;padding:16px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0";
+            pd.querySelector("div:last-child").appendChild(el);
+          }
+          el.innerHTML = '<h3 style="color:var(--green-800);margin-bottom:8px">🎁 Combo Offers</h3>' +
+            combos.map(function(c) {
+              return '<div style="margin-bottom:8px;padding:8px;background:#fff;border-radius:8px">' +
+                '<b>' + c.name + '</b>' +
+                (c.description ? '<p style="font-size:13px;color:#666">' + c.description + '</p>' : '') +
+                '<p style="font-size:13px;color:var(--green-700)">Save ' +
+                  (c.discount_type === 'percent' ? c.discount_value + '%' :
+                   c.discount_type === 'flat' ? '₹' + c.discount_value :
+                   c.discount_type === 'free' ? 'FREE product' : '₹' + c.bundle_price + ' bundle') +
+                '</p></div>';
+            }).join("");
+        }).catch(function(){});
+      }
       // related
       renderGrid("#related", PRODUCTS.filter(function (x) { return x.id !== p.id && (x.category === p.category || x.concerns.some(function (c) { return p.concerns.indexOf(c) > -1; })); }).slice(0, 4));
     }

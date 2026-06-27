@@ -80,6 +80,9 @@
             '<div class="field"><label>State *</label><input required name="state" /></div></div>' +
             '<div class="field--row"><div class="field"><label>Pincode *</label><input required name="pincode" pattern="[0-9]{6}" /></div>' +
             '<div class="field"><label>Landmark</label><input name="landmark" /></div></div>' +
+            '<div class="field--row"><div class="field"><label>GST Number (optional)</label><input name="gst_number" placeholder="e.g. 22AAAAA0000A1Z5" /></div>' +
+            '<div class="field"><label>Order Notes</label><input name="order_notes" placeholder="Any special instructions" /></div></div>' +
+            '<div class="field" style="margin-top:12px"><label>Coupon Code</label><div style="display:flex;gap:8px"><input name="coupon" id="couponInput" placeholder="Enter coupon code" /><button type="button" class="btn btn--ghost btn--sm" id="applyCoupon">Apply</button></div><span id="couponMsg" style="font-size:12px;color:var(--green-700)"></span></div>' +
             '<h3 style="color:var(--green-900);margin:18px 0 12px">Payment Method</h3>' +
             '<div class="pay-opts">' + payOpts + '</div>' +
           '</form>' +
@@ -89,7 +92,8 @@
             '<div class="line"><span>Subtotal</span><span>' + money(sub) + '</span></div>' +
             (disc > 0 ? '<div class="line" style="color:var(--green-700)"><span>Discount</span><span>− ' + money(disc) + '</span></div>' : '') +
             '<div class="line"><span>Delivery</span><span style="color:var(--green-700)">FREE</span></div>' +
-            '<div class="line grand"><span>Total</span><span>' + money(total) + '</span></div>' +
+            '<div id="taxLine"></div>' +
+            '<div class="line grand"><span>Total</span><span id="grandTotal">' + money(total) + '</span></div>' +
             '<button class="btn btn--primary btn--block" form="orderForm" style="margin-top:16px" type="submit">Place Order</button>' +
             '<a class="btn btn--ghost btn--block" id="waOrder" style="margin-top:8px" target="_blank" rel="noopener">Order via WhatsApp</a>' +
             (disc === 0 && sub < 999 ? '<p style="font-size:.78rem;color:var(--muted);margin-top:12px;text-align:center">Add ' + money(999 - sub) + ' more to unlock 8% off!</p>' : '') +
@@ -115,6 +119,36 @@
         "%0ATotal: " + money(total);
       document.getElementById("waOrder").href = "https://wa.me/919999999999?text=" + waText;
 
+      // Coupon apply
+      var appliedCoupon = "";
+      var couponDiscount = 0;
+      document.getElementById("applyCoupon").onclick = function() {
+        var code = document.getElementById("couponInput").value.trim();
+        if (!code) return;
+        // Server-side quote to validate coupon
+        if (window.PNW_API && window.PNW_API.checkoutQuote) {
+          window.PNW_API.checkoutQuote({
+            items: PNW.getCart().map(function(i) { return { id: i.id, qty: i.qty }; }),
+            coupon_code: code, state: document.querySelector('[name=state]').value || "Maharashtra"
+          }).then(function(q) {
+            if (q.coupon_discount > 0) {
+              appliedCoupon = code;
+              couponDiscount = q.coupon_discount;
+              document.getElementById("couponMsg").textContent = "Coupon applied! Saving " + money(q.coupon_discount);
+              document.getElementById("couponMsg").style.color = "var(--green-700)";
+              document.getElementById("grandTotal").textContent = money(q.total);
+              if (q.tax_amount) document.getElementById("taxLine").innerHTML = '<div class="line"><span>Tax (GST)</span><span>' + money(q.tax_amount) + '</span></div>';
+            } else {
+              document.getElementById("couponMsg").textContent = "Coupon not applicable";
+              document.getElementById("couponMsg").style.color = "red";
+            }
+          }).catch(function(e) {
+            document.getElementById("couponMsg").textContent = e.message;
+            document.getElementById("couponMsg").style.color = "red";
+          });
+        }
+      };
+
       document.getElementById("orderForm").addEventListener("submit", function (e) {
         e.preventDefault();
         var fd = new FormData(e.target);
@@ -130,6 +164,8 @@
           customer_name: fd.get("name"), phone: fd.get("phone"), email: fd.get("email") || "",
           address: fd.get("address"), city: fd.get("city"), state: fd.get("state"),
           pincode: fd.get("pincode"), landmark: fd.get("landmark") || "", payment_method: method,
+          gst_number: fd.get("gst_number") || "", order_notes: fd.get("order_notes") || "",
+          coupon_code: appliedCoupon || "",
           items: PNW.getCart().map(function (i) { return { id: i.id, size: i.size, qty: i.qty }; })
         };
         window.PNW_API.placeOrder(payload).then(function (order) {
