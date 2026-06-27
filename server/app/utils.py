@@ -1,3 +1,4 @@
+"""Shared utilities for PrimeNutra Wellness backend."""
 import re
 
 from sqlalchemy.orm import Session
@@ -8,18 +9,41 @@ DEFAULT_SETTINGS = {
     "store_name": "PrimeNutra Wellness",
     "whatsapp_number": "919999999999",
     "cod_enabled": "true",
+    "cod_min_order": "0",
+    "cod_max_order": "0",
+    "cod_charge": "0",
     "razorpay_enabled": "false",
     "razorpay_key_id": "",
     "razorpay_key_secret": "",
+    "partial_payment_enabled": "false",
+    "partial_min_advance": "500",
     "free_ship_threshold": "0",
     "shipping_fee": "0",
     "support_email": "care@primenutrawellness.in",
+    "support_phone": "",
     "brevo_from_email": "care@primenutrawellness.in",
     "brevo_from_name": "PrimeNutra Wellness",
+    "brevo_api_key": "",
+    "whatsapp_api_key": "",
+    "whatsapp_api_url": "",
+    "gst_number": "",
+    "company_name": "PrimeNutra Wellness",
+    "company_address": "",
+    "company_state": "",
+    "company_state_code": "",
+    "invoice_prefix": "INV",
+    "invoice_counter": "0",
+    "ga4_measurement_id": "",
+    "gtm_container_id": "",
+    "meta_pixel_id": "",
+    "fb_access_token": "",
+    "otp_provider": "console",  # console | twilio | msg91
+    "otp_api_key": "",
+    "otp_sender_id": "",
 }
 
-# Keys that must never be returned to the public / non-admin
-SECRET_SETTING_KEYS = {"razorpay_key_secret"}
+SECRET_SETTING_KEYS = {"razorpay_key_secret", "brevo_api_key", "whatsapp_api_key",
+                       "fb_access_token", "otp_api_key"}
 
 
 def slugify(text: str) -> str:

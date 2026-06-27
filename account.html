@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Account – PrimeNutra Wellness</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%BF%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <div class="account-wrap" id="accountWrap">
+    <h1 id="accountGreeting">My Account</h1>
+    <div class="account-tabs" id="accountTabs">
+      <button class="tab active" data-tab="profile">Profile</button>
+      <button class="tab" data-tab="orders">Orders</button>
+      <button class="tab" data-tab="addresses">Addresses</button>
+      <button class="tab" data-tab="wishlist">Wishlist</button>
+      <button class="tab" data-tab="returns">Returns</button>
+      <button class="tab" data-tab="recent">Recently Viewed</button>
+    </div>
+    <div class="account-panel active" id="panel-profile"></div>
+    <div class="account-panel" id="panel-orders"></div>
+    <div class="account-panel" id="panel-addresses"></div>
+    <div class="account-panel" id="panel-wishlist"></div>
+    <div class="account-panel" id="panel-returns"></div>
+    <div class="account-panel" id="panel-recent"></div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="js/products.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+  (function() {
+    if (!window.PNW_AUTH || !window.PNW_AUTH.isLoggedIn()) {
+      location.href = "index.html";
+      return;
+    }
+
+    var tabs = document.querySelectorAll(".account-tabs .tab");
+    tabs.forEach(function(t) {
+      t.addEventListener("click", function() {
+        tabs.forEach(function(x) { x.classList.remove("active"); });
+        t.classList.add("active");
+        document.querySelectorAll(".account-panel").forEach(function(p) { p.classList.remove("active"); });
+        document.getElementById("panel-" + t.dataset.tab).classList.add("active");
+        loadPanel(t.dataset.tab);
+      });
+    });
+
+    function formatINR(n) { return "\u20B9" + Number(n).toLocaleString("en-IN"); }
+
+    function statusPill(s) {
+      var cls = "green";
+      if (["cancelled","refunded","returned"].indexOf(s)>=0) cls = "red";
+      else if (["placed","pending","requested"].indexOf(s)>=0) cls = "amber";
+      return '<span class="pill '+cls+'">'+s+'</span>';
+    }
+
+    function loadPanel(name) {
+      if (name === "profile") loadProfile();
+      if (name === "orders") loadOrders();
+      if (name === "addresses") loadAddresses();
+      if (name === "wishlist") loadWishlist();
+      if (name === "returns") loadReturns();
+      if (name === "recent") loadRecent();
+    }
+
+    function loadProfile() {
+      var el = document.getElementById("panel-profile");
+      el.innerHTML = "<p>Loading...</p>";
+      window.PNW_AUTH.getProfile().then(function(p) {
+        el.innerHTML = '<div class="account-card">' +
+          '<h3>Profile</h3>' +
+          '<form id="profileForm">' +
+          '<div class="field"><label>Name</label><input name="name" value="'+(p.name||"")+'" placeholder="Your name"></div>' +
+          '<div class="field"><label>Email</label><input name="email" type="email" value="'+(p.email||"")+'" placeholder="Email (optional)"></div>' +
+          '<div class="field"><label>Phone</label><input value="'+(p.phone||"")+'" disabled></div>' +
+          '<div class="field"><label>GST Number</label><input name="gst_number" value="'+(p.gst_number||"")+'" placeholder="GST (optional)"></div>' +
+          '<button type="submit" class="btn btn--primary">Save Profile</button>' +
+          '</form>' +
+          '</div>' +
+          '<button class="btn btn--ghost" style="margin-top:12px" onclick="PNW_AUTH.logout()">Logout</button>';
+        document.getElementById("profileForm").onsubmit = function(e) {
+          e.preventDefault();
+          var fd = new FormData(e.target);
+          window.PNW_AUTH.updateProfile({
+            name: fd.get("name"), email: fd.get("email"), gst_number: fd.get("gst_number")
+          }).then(function() { PNW.toast("Profile updated"); }).catch(function(err) { PNW.toast(err.message); });
+        };
+        document.getElementById("accountGreeting").textContent = "Hello" + (p.name ? ", " + p.name : "") + "!";
+      }).catch(function() { el.innerHTML = "<p>Error loading profile. Please login again.</p>"; });
+    }
+
+    function loadOrders() {
+      var el = document.getElementById("panel-orders");
+      el.innerHTML = "<p>Loading orders...</p>";
+      window.PNW_ACCOUNT.getOrders().then(function(orders) {
+        if (!orders.length) { el.innerHTML = "<p>No orders yet.</p>"; return; }
+        el.innerHTML = '<h2>Your Orders</h2>' + orders.map(function(o) {
+          return '<div class="account-card">' +
+            '<h3>Order #' + o.id.substr(0,8) + ' ' + statusPill(o.status) + '</h3>' +
+            '<p>Date: ' + (o.created_at||"").substr(0,10) + '</p>' +
+            '<p>Total: <b>' + formatINR(o.total) + '</b> | Payment: ' + o.payment_method + '</p>' +
+            '<p>Items: ' + (o.items||[]).map(function(i){ return i.product_id + ' x' + i.qty; }).join(", ") + '</p>' +
+            (o.tracking_number ? '<p>Tracking: ' + o.tracking_number + ' (' + (o.courier||"") + ')</p>' : '') +
+            '<a href="track.html?id=' + o.id + '" class="btn btn--ghost btn--sm" style="margin-top:8px">Track Order</a>' +
+            '</div>';
+        }).join("");
+      }).catch(function() { el.innerHTML = "<p>Error loading orders.</p>"; });
+    }
+
+    function loadAddresses() {
+      var el = document.getElementById("panel-addresses");
+      el.innerHTML = "<p>Loading...</p>";
+      window.PNW_AUTH.getAddresses().then(function(addrs) {
+        el.innerHTML = '<h2>Saved Addresses</h2>' +
+          '<button class="btn btn--primary btn--sm" id="addAddrBtn" style="margin-bottom:12px">+ Add Address</button>' +
+          '<div class="account-grid" id="addrGrid">' +
+          addrs.map(function(a) {
+            return '<div class="account-card">' +
+              '<h3>' + (a.label||"Address") + (a.is_default ? ' <span class="pill green">Default</span>' : '') + '</h3>' +
+              '<p>' + a.name + '</p>' +
+              '<p>' + a.line1 + (a.line2 ? ", " + a.line2 : "") + '</p>' +
+              '<p>' + a.city + ', ' + a.state + ' - ' + a.pincode + '</p>' +
+              '<p>Phone: ' + a.phone + '</p>' +
+              '<button class="btn btn--ghost btn--sm" onclick="deleteAddr(' + a.id + ')">Delete</button>' +
+              '</div>';
+          }).join("") +
+          '</div>';
+        document.getElementById("addAddrBtn").onclick = function() { showAddressForm(el); };
+      }).catch(function() { el.innerHTML = "<p>Error loading addresses.</p>"; });
+    }
+
+    window.deleteAddr = function(id) {
+      window.PNW_AUTH.deleteAddress(id).then(function() { loadAddresses(); PNW.toast("Address deleted"); });
+    };
+
+    function showAddressForm(el) {
+      var form = document.createElement("div");
+      form.className = "account-card";
+      form.innerHTML = '<h3>Add New Address</h3>' +
+        '<form id="addrForm">' +
+        '<div class="field"><label>Label</label><input name="label" value="Home" placeholder="Home/Office"></div>' +
+        '<div class="field"><label>Name</label><input name="name" required placeholder="Full name"></div>' +
+        '<div class="field"><label>Phone</label><input name="phone" required placeholder="Phone number"></div>' +
+        '<div class="field"><label>Address Line 1</label><input name="line1" required placeholder="Street, Building"></div>' +
+        '<div class="field"><label>Address Line 2</label><input name="line2" placeholder="Landmark (optional)"></div>' +
+        '<div class="field"><label>Pincode</label><input name="pincode" required placeholder="6-digit pincode"></div>' +
+        '<div class="field"><label>City</label><input name="city" required placeholder="City"></div>' +
+        '<div class="field"><label>State</label><input name="state" required placeholder="State"></div>' +
+        '<label><input type="checkbox" name="is_default"> Set as default</label><br><br>' +
+        '<button type="submit" class="btn btn--primary">Save Address</button> ' +
+        '<button type="button" class="btn btn--ghost" onclick="loadAddresses()">Cancel</button>' +
+        '</form>';
+      el.prepend(form);
+      document.getElementById("addrForm").onsubmit = function(e) {
+        e.preventDefault();
+        var fd = new FormData(e.target);
+        window.PNW_AUTH.addAddress({
+          label: fd.get("label"), name: fd.get("name"), phone: fd.get("phone"),
+          line1: fd.get("line1"), line2: fd.get("line2"), pincode: fd.get("pincode"),
+          city: fd.get("city"), state: fd.get("state"), is_default: !!fd.get("is_default"),
+        }).then(function() { loadAddresses(); PNW.toast("Address added"); });
+      };
+    }
+
+    function loadWishlist() {
+      var el = document.getElementById("panel-wishlist");
+      el.innerHTML = "<p>Loading...</p>";
+      window.PNW_ACCOUNT.getWishlist().then(function(items) {
+        if (!items.length) { el.innerHTML = "<p>Your wishlist is empty.</p>"; return; }
+        el.innerHTML = '<h2>Wishlist</h2><div class="account-grid">' +
+          items.map(function(w) {
+            return '<div class="account-card">' +
+              '<h3>' + (w.product_name||w.product_id) + '</h3>' +
+              '<p>Added: ' + (w.added_at||"").substr(0,10) + '</p>' +
+              '<button class="btn btn--primary btn--sm" onclick="PNW.addToCart(\''+w.product_id+'\')">Add to Cart</button> ' +
+              '<button class="btn btn--ghost btn--sm" onclick="PNW_ACCOUNT.removeWishlist(\''+w.product_id+'\').then(function(){loadPanel(\'wishlist\')})">Remove</button>' +
+              '</div>';
+          }).join("") + '</div>';
+      }).catch(function() { el.innerHTML = "<p>Error loading wishlist.</p>"; });
+    }
+
+    function loadReturns() {
+      var el = document.getElementById("panel-returns");
+      el.innerHTML = "<p>Loading...</p>";
+      window.PNW_ACCOUNT.getReturns().then(function(returns) {
+        if (!returns.length) { el.innerHTML = "<p>No return requests.</p>"; return; }
+        el.innerHTML = '<h2>Return Requests</h2>' + returns.map(function(r) {
+          return '<div class="account-card">' +
+            '<h3>Return #' + r.id + ' ' + statusPill(r.status) + '</h3>' +
+            '<p>Order: ' + (r.order_id||"").substr(0,8) + '</p>' +
+            '<p>Reason: ' + r.reason + '</p>' +
+            (r.refund_amount ? '<p>Refund: ' + formatINR(r.refund_amount) + ' (' + r.refund_method + ')</p>' : '') +
+            '</div>';
+        }).join("");
+      }).catch(function() { el.innerHTML = "<p>Error loading returns.</p>"; });
+    }
+
+    function loadRecent() {
+      var el = document.getElementById("panel-recent");
+      el.innerHTML = "<p>Loading...</p>";
+      window.PNW_ACCOUNT.getRecentlyViewed().then(function(items) {
+        if (!items.length) { el.innerHTML = "<p>No recently viewed products.</p>"; return; }
+        el.innerHTML = '<h2>Recently Viewed</h2><div class="account-grid">' +
+          items.map(function(rv) {
+            return '<div class="account-card">' +
+              '<h3>' + (rv.product_name||rv.product_id) + '</h3>' +
+              '<button class="btn btn--primary btn--sm" onclick="location.href=\'product.html?id='+rv.product_id+'\'">View Product</button>' +
+              '</div>';
+          }).join("") + '</div>';
+      }).catch(function() { el.innerHTML = "<p>Error loading recently viewed.</p>"; });
+    }
+
+    // Initial load
+    loadProfile();
+  })();
+  </script>
+  <script src="js/api.js"></script>
+</body>
+</html>
